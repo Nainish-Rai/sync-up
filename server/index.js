@@ -36,10 +36,21 @@ io.on("connection", (socket) => {
     socket.on("msg:send", (data) => {
       io.to(room).emit("msg:send", data);
     });
-    // const activeSockets = await io.in(room).fetchSockets();
-    // const activeUsernames = activeSockets.forEach((item) => {
-    //   return socketToUsernameMap.get(item.id);
-    // });
+
+    socket.on("user:call", ({ to, offer }) => {
+      io.to(to).emit("incoming:call", { from: room, offer });
+    });
+
+    socket.on("call:accepted", ({ to, ans }) => {
+      io.to(to).emit("call:accepted", { from: room, ans });
+    });
+
+    socket.on("peer:nego:needed", ({ to, offer }) => {
+      io.to(to).emit("peer:nego:needed", { from: room, offer });
+    });
+    socket.on("peer:nego:done", ({ to, ans }) => {
+      io.to(to).emit("peer:nego:final", { from: room, ans });
+    });
   });
 });
 
